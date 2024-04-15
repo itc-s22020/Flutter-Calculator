@@ -6,9 +6,77 @@ class CalculatorPage extends HookWidget {
   const CalculatorPage({super.key});
 
 
-  void incrementCalcText(String text, calcText)
-  {
-    calcText.value += text;
+
+  void incrementText(String incrementText, ValueNotifier<String> text) {
+    text.value += incrementText;
+  }
+
+  void decrementText(ValueNotifier<String> text) {
+    final pos = text.value.length - 1;
+    if (pos >= 0) {
+      text.value = text.value.substring(0,pos);
+    }
+  }
+
+  void bracketsText(ValueNotifier<String> text) {
+    final textValue = text.value;
+    final length = textValue.length;
+    final leftBracketIndex = textValue.lastIndexOf("(");
+    final rightBracketIndex = textValue.lastIndexOf(")");
+    final leftBracketCount = length - textValue.replaceAll("(", "").length;
+    final rightBracketCount = length - textValue.replaceAll(")", "").length;
+
+    if (textValue.isEmpty || leftBracketCount == 0) {
+      incrementText("(", text);
+    } else if(length-1==leftBracketIndex) {
+      incrementText("(", text);
+    } else if(leftBracketCount > rightBracketCount) {
+      incrementText(")", text);
+    } else if(leftBracketIndex < rightBracketIndex){
+      incrementText("(", text);
+    } else{
+      incrementText(")", text);
+    }
+  }
+
+
+  void clearText(ValueNotifier<String> text) {
+    text.value = "";
+  }
+
+  void calculatorButtonSwitch(String buttonText, ValueNotifier<String> text) {
+    switch(buttonText) {
+      case "0":
+      case "1":
+      case "2":
+      case "3":
+      case "4":
+      case "5":
+      case "6":
+      case "7":
+      case "8":
+      case "9":
+      case "+":
+      case "-":
+      case "×":
+      case "÷":
+      case "%":
+        incrementText(buttonText, text);
+        break;
+      case "( )":
+        bracketsText(text);
+        break;
+      case "C":
+        decrementText(text);
+        break;
+      case "AC":
+        clearText(text);
+        break;
+      case _:
+        clearText(text);
+        incrementText("Error", text);
+        break;
+    }
   }
 
   @override
@@ -16,7 +84,7 @@ class CalculatorPage extends HookWidget {
   {
     final calcText = useState<String>("");
 
-    List<String> textList =
+    final List<String> textList =
     [
       "AC","( )","%" ,"÷",
       "7" , "8" ,"9" ,"×",
@@ -54,8 +122,7 @@ class CalculatorPage extends HookWidget {
                               bottomRight: Radius.circular(50),
                             ),
                           ),
-
-                          child: Text(calcText.value),
+                            child: Text(calcText.value)
                         ),
                         Expanded(
                             child:Container(
@@ -88,7 +155,7 @@ class CalculatorPage extends HookWidget {
   Widget _calculatorButton(String buttonText, calcText) {
     return ElevatedButton(
       onPressed: () {
-        incrementCalcText(buttonText, calcText);
+        calculatorButtonSwitch(buttonText, calcText);
       },
       child: Text(
         buttonText,
