@@ -158,12 +158,12 @@ class CalculatorPage extends HookWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                padding: const EdgeInsets.only(top: 2,bottom: 2),
+                                padding: const EdgeInsets.only(left: 10,right: 10),
                                 alignment: Alignment.bottomRight,
                                 child: AutoSizeText(
                                   logText.value,
                                   style: const TextStyle(
-                                    fontSize: 60,
+                                    fontSize: 30,
                                     color: Colors.grey
                                   ),
                                   maxLines: 1,
