@@ -2,13 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 class CalculatorPage extends HookWidget {
   const CalculatorPage({super.key});
 
-
+  void calculator(ValueNotifier<String> text) {
+    final calcText = text.value.replaceAll("÷", "/").replaceAll("×", "*");
+    Parser p = Parser();
+    clearText(text);
+    try {
+      Expression exp = p.parse(calcText);
+      double calc = exp.evaluate(EvaluationType.REAL,ContextModel());
+      incrementText(calc.toString(), text);
+    } catch(e) {
+      incrementText("Error", text);
+      return;
+    }
+  }
 
   void incrementText(String incrementText, ValueNotifier<String> text) {
+    if(text.value == "Error") {
+      clearText(text);
+    }
     text.value += incrementText;
   }
 
@@ -74,8 +90,7 @@ class CalculatorPage extends HookWidget {
         clearText(text);
         break;
       case _:
-        clearText(text);
-        incrementText("Error", text);
+        calculator(text);
         break;
     }
   }
@@ -123,16 +138,21 @@ class CalculatorPage extends HookWidget {
                               bottomRight: Radius.circular(50),
                             ),
                           ),
-                          child:Container(
-                            alignment: Alignment.bottomRight,
-                            padding: EdgeInsets.only(bottom: 20.h),
-                            child: AutoSizeText(
-                              calcText.value,
-                              style: const TextStyle(
-                                  fontSize: 95
-                              ),
-                              maxLines: 1,
-                            ),
+                          child:Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                alignment: Alignment.bottomRight,
+                                padding: EdgeInsets.only(bottom: 20.h,left: 5.h,right: 5.h),
+                                child: AutoSizeText(
+                                  calcText.value,
+                                  style: const TextStyle(
+                                      fontSize: 95
+                                  ),
+                                  maxLines: 1,
+                                ),
+                              )
+                            ],
                           )
                         ),
                         Expanded(
