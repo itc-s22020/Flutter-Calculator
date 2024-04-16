@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class CalculatorPage extends HookWidget {
   const CalculatorPage({super.key});
@@ -122,7 +123,17 @@ class CalculatorPage extends HookWidget {
                               bottomRight: Radius.circular(50),
                             ),
                           ),
-                            child: Text(calcText.value)
+                          child:Container(
+                            alignment: Alignment.bottomRight,
+                            padding: EdgeInsets.only(bottom: 20.h),
+                            child: AutoSizeText(
+                              calcText.value,
+                              style: const TextStyle(
+                                  fontSize: 95
+                              ),
+                              maxLines: 1,
+                            ),
+                          )
                         ),
                         Expanded(
                             child:Container(
