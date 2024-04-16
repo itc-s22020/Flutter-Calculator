@@ -14,7 +14,8 @@ class CalculatorPage extends HookWidget {
     try {
       Expression exp = p.parse(calcText);
       double calc = exp.evaluate(EvaluationType.REAL,ContextModel());
-      incrementText(calc.toString(), text);
+      RegExp reg = RegExp(r'\.0+$'); //正規表現で少数以下がない場合破棄
+      incrementText(calc.toString().replaceAll(reg, ""), text);
     } catch(e) {
       incrementText("Error", text);
       return;
@@ -61,7 +62,15 @@ class CalculatorPage extends HookWidget {
     text.value = "";
   }
 
-  void calculatorButtonSwitch(String buttonText, ValueNotifier<String> text) {
+  void saveLog(String saveText,ValueNotifier<String> text) {
+    text.value = saveText;
+  }
+
+  void loadLog(ValueNotifier<String> saveText, ValueNotifier<String> text) {
+    text.value = saveText.value;
+  }
+
+  void calculatorButtonSwitch(String buttonText, ValueNotifier<String> text, ValueNotifier<String> logText) {
     switch(buttonText) {
       case "0":
       case "1":
@@ -77,7 +86,7 @@ class CalculatorPage extends HookWidget {
       case "-":
       case "×":
       case "÷":
-      case "%":
+      case ".":
         incrementText(buttonText, text);
         break;
       case "( )":
@@ -89,6 +98,12 @@ class CalculatorPage extends HookWidget {
       case "AC":
         clearText(text);
         break;
+      case "<":
+        loadLog(logText, text);
+        break;
+      case "=":
+        saveLog(text.value, logText);
+        calculator(text);
       case _:
         calculator(text);
         break;
@@ -99,10 +114,11 @@ class CalculatorPage extends HookWidget {
   Widget build(BuildContext context)
   {
     final calcText = useState<String>("");
+    final logText = useState<String>("");
 
     final List<String> textList =
     [
-      "AC","( )","%" ,"÷",
+      "AC","( )","<" ,"÷",
       "7" , "8" ,"9" ,"×",
       "4" , "5" ,"6" ,"-",
       "1" , "2" ,"3" ,"+",
@@ -114,7 +130,7 @@ class CalculatorPage extends HookWidget {
     for (String text in textList)
     {
       buttonList.add(
-        _calculatorButton(text, calcText)
+        _calculatorButton(text, calcText, logText)
       );
     }
 
@@ -139,15 +155,27 @@ class CalculatorPage extends HookWidget {
                             ),
                           ),
                           child:Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
+                                padding: const EdgeInsets.only(top: 2,bottom: 2),
                                 alignment: Alignment.bottomRight,
-                                padding: EdgeInsets.only(bottom: 20.h,left: 5.h,right: 5.h),
+                                child: AutoSizeText(
+                                  logText.value,
+                                  style: const TextStyle(
+                                    fontSize: 60,
+                                    color: Colors.grey
+                                  ),
+                                  maxLines: 1,
+                                ),
+                              ),
+                              Container(
+                                alignment: Alignment.topRight,
+                                padding: EdgeInsets.only(bottom: 0.h,left: 5.h,right: 5.h,top: 0),
                                 child: AutoSizeText(
                                   calcText.value,
                                   style: const TextStyle(
-                                      fontSize: 95
+                                      fontSize: 90,
                                   ),
                                   maxLines: 1,
                                 ),
@@ -183,10 +211,10 @@ class CalculatorPage extends HookWidget {
     );
   }
 
-  Widget _calculatorButton(String buttonText, calcText) {
+  Widget _calculatorButton(String buttonText, ValueNotifier<String> calcText, ValueNotifier<String> logText) {
     return ElevatedButton(
       onPressed: () {
-        calculatorButtonSwitch(buttonText, calcText);
+        calculatorButtonSwitch(buttonText, calcText, logText);
       },
       child: Text(
         buttonText,
