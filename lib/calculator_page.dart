@@ -73,21 +73,8 @@ class CalculatorPage extends HookWidget {
 
   void calculatorButtonSwitch(String buttonText, ValueNotifier<String> text, ValueNotifier<String> logText) {
     switch(buttonText) {
-      case "0":
-      case "1":
-      case "2":
-      case "3":
-      case "4":
-      case "5":
-      case "6":
-      case "7":
-      case "8":
-      case "9":
-      case "+":
-      case "-":
-      case "×":
-      case "÷":
-      case ".":
+      case "0"||"1"||"2"||"3"||"4"||"5"||"6"||"7"||"8"||"9":
+      case "+"||"-"||"×"||"÷"||".":
         incrementText(buttonText, text);
         break;
       case "( )":
@@ -105,8 +92,8 @@ class CalculatorPage extends HookWidget {
       case "=":
         saveLog(text.value, logText);
         calculator(text);
+        break;
       case _:
-        calculator(text);
         break;
     }
   }
