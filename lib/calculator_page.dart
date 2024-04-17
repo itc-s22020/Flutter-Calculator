@@ -1,3 +1,4 @@
+import 'package:calculator/widget/calculator_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -110,6 +111,7 @@ class CalculatorPage extends HookWidget {
     }
   }
 
+
   @override
   Widget build(BuildContext context)
   {
@@ -130,7 +132,12 @@ class CalculatorPage extends HookWidget {
     for (String text in textList)
     {
       buttonList.add(
-        _calculatorButton(text, calcText, logText)
+        CalculatorButton(
+            buttonText: text,
+            calcText: calcText,
+            logText: logText,
+            onPressedFunction: calculatorButtonSwitch
+        )
       );
     }
 
@@ -210,17 +217,4 @@ class CalculatorPage extends HookWidget {
         )
     );
   }
-
-  Widget _calculatorButton(String buttonText, ValueNotifier<String> calcText, ValueNotifier<String> logText) {
-    return ElevatedButton(
-      onPressed: () {
-        calculatorButtonSwitch(buttonText, calcText, logText);
-      },
-      child: Text(
-        buttonText,
-        style: const TextStyle(fontSize: 35),
-      ),
-    );
-  }
-
 }
