@@ -3,105 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:math_expressions/math_expressions.dart';
 
 class CalculatorPage extends HookWidget {
   const CalculatorPage({super.key});
 
-  void calculator(ValueNotifier<String> text) {
-    final calcText = text.value.replaceAll("÷", "/").replaceAll("×", "*");
-    Parser p = Parser();
-    clearText(text);
-    try {
-      Expression exp = p.parse(calcText);
-      double calc = exp.evaluate(EvaluationType.REAL,ContextModel());
-      RegExp reg = RegExp(r'\.0+$'); //正規表現で少数以下がない場合破棄
-      incrementText(calc.toString().replaceAll(reg, ""), text);
-    } catch(e) {
-      incrementText("Error", text);
-      return;
-    }
-  }
-
-  void incrementText(String incrementText, ValueNotifier<String> text) {
-    if(text.value == "Error") {
-      clearText(text);
-    }
-    text.value += incrementText;
-  }
-
-  void decrementText(ValueNotifier<String> text) {
-    final pos = text.value.length - 1;
-    if (pos >= 0) {
-      text.value = text.value.substring(0,pos);
-    }
-  }
-
-  void bracketsText(ValueNotifier<String> text) {
-    final textValue = text.value;
-    final length = textValue.length;
-    final leftBracketIndex = textValue.lastIndexOf("(");
-    final rightBracketIndex = textValue.lastIndexOf(")");
-    final leftBracketCount = length - textValue.replaceAll("(", "").length;
-    final rightBracketCount = length - textValue.replaceAll(")", "").length;
-
-    if (textValue.isEmpty || leftBracketCount == 0) {
-      incrementText("(", text);
-    } else if(length-1==leftBracketIndex) {
-      incrementText("(", text);
-    } else if(leftBracketCount > rightBracketCount) {
-      incrementText(")", text);
-    } else if(leftBracketIndex < rightBracketIndex){
-      incrementText("(", text);
-    } else{
-      incrementText(")", text);
-    }
-  }
-
-
-  void clearText(ValueNotifier<String> text) {
-    text.value = "";
-  }
-
-  void saveLog(String saveText,ValueNotifier<String> text) {
-    text.value = saveText;
-  }
-
-  void loadLog(ValueNotifier<String> saveText, ValueNotifier<String> text) {
-    text.value = saveText.value;
-  }
-
-  void calculatorButtonSwitch(String buttonText, ValueNotifier<String> text, ValueNotifier<String> logText) {
-    switch(buttonText) {
-      case "0"||"1"||"2"||"3"||"4"||"5"||"6"||"7"||"8"||"9":
-      case "+"||"-"||"×"||"÷"||".":
-        incrementText(buttonText, text);
-        break;
-      case "( )":
-        bracketsText(text);
-        break;
-      case "C":
-        decrementText(text);
-        break;
-      case "AC":
-        clearText(text);
-        break;
-      case "<":
-        loadLog(logText, text);
-        break;
-      case "=":
-        saveLog(text.value, logText);
-        calculator(text);
-        break;
-      case _:
-        break;
-    }
-  }
-
-
   @override
   Widget build(BuildContext context)
-  {
+    {
     final calcText = useState<String>("");
     final logText = useState<String>("");
 
@@ -117,16 +25,15 @@ class CalculatorPage extends HookWidget {
     List<Widget> buttonList = [];
 
     for (String text in textList)
-    {
+      {
       buttonList.add(
         CalculatorButton(
             buttonText: text,
             calcText: calcText,
-            logText: logText,
-            onPressedFunction: calculatorButtonSwitch
-        )
-      );
-    }
+            logText: logText
+          )
+        );
+      }
 
     return MaterialApp(
         home: Scaffold(
@@ -177,30 +84,42 @@ class CalculatorPage extends HookWidget {
                             ],
                           )
                         ),
-                        Expanded(
-                            child:Container(
-                              alignment: Alignment.center,
-                              child: GridView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(), //スクロール無効
-                                itemCount: buttonList.length,
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 4,
-                                  mainAxisSpacing: 5,
-                                  crossAxisSpacing: 5,
-                                ),
-                                padding: const EdgeInsets.all(8),
-                                itemBuilder: (BuildContext context, int index) {
-                                  return buttonList[index];
-                                  },
-                              ),
-                            )
-                        )
-
+                        _CalculatorButtons(buttonList: buttonList)
                       ]
                   )
               ),
             )
+        )
+    );
+  }
+}
+
+
+class _CalculatorButtons extends HookWidget {
+  const _CalculatorButtons({
+    required this.buttonList
+  });
+  final List<Widget> buttonList;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+        child:Container(
+          alignment: Alignment.center,
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(), //スクロール無効
+            itemCount: buttonList.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              mainAxisSpacing: 5,
+              crossAxisSpacing: 5,
+            ),
+            padding: const EdgeInsets.all(8),
+            itemBuilder: (BuildContext context, int index) {
+              return buttonList[index];
+            },
+          ),
         )
     );
   }
