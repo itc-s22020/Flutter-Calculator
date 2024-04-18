@@ -33,6 +33,7 @@ class CalculatorButton extends StatelessWidget {
           break;
         case "AC":
           textCalculator.clearText(text);
+          textCalculator.clearText(logText);
           break;
         case "<":
           textCalculator.loadLog(logText, text);

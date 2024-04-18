@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
 
 class TextCalculator {
@@ -21,22 +22,18 @@ class TextCalculator {
   ///　計算式が適切になるように括弧を追加
   void bracketsText(ValueNotifier<String> text) {
     final textValue = text.value;
-    final length = textValue.length;
-    final leftBracketIndex = textValue.lastIndexOf("(");
-    final rightBracketIndex = textValue.lastIndexOf(")");
-    final leftBracketCount = length - textValue.replaceAll("(", "").length;
-    final rightBracketCount = length - textValue.replaceAll(")", "").length;
 
-    if (textValue.isEmpty || leftBracketCount == 0) {
-      incrementText("(", text);
-    } else if (length - 1 == leftBracketIndex) {
-      incrementText("(", text);
-    } else if (leftBracketCount > rightBracketCount) {
-      incrementText(")", text);
-    } else if (leftBracketIndex < rightBracketIndex) {
+    if (textValue.isEmpty || textValue.endsWith("(")) {
       incrementText("(", text);
     } else {
-      incrementText(")", text);
+      //count関数が見つけきれなかったのでsplitのlengthから取得
+      final leftBracketCount = textValue.split("(").length - 1;
+      final rightBracketCount = textValue.split(")").length - 1;
+      if(leftBracketCount > rightBracketCount) {
+        incrementText(")", text);
+      }else{
+        incrementText("(", text);
+      }
     }
   }
 
